@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 # borrow code from https://github.com/patrickwangqy/AutoUpdateDomain.git
 # whith modify by hjm
+# dependecy: pip install requests tencentcloud-sdk-python
 from QcloudApi.qcloudapi import QcloudApi
 import requests
 import json
@@ -11,15 +12,25 @@ import time
 import argparse
 import sys
 from socket import gethostbyname
-reload(sys) 
-sys.setdefaultencoding('utf8') 
+#python3已经不需要
+#reload(sys) 
+#sys.setdefaultencoding('utf8') 
 #get your true IP
 def get_out_ip():
+    # session = requests.Session()
+    # session.trust_env = False
+    # response = session.get('http://ifconfig.co/ip')
+    # myip = response.text.strip()
+    # return "%s" % myip
+    return get_out_ip_from_taobao()
+
+def get_out_ip_from_taobao():
     session = requests.Session()
     session.trust_env = False
-    response = session.get('http://ifconfig.co/ip')
-    myip = response.text.strip()
-    return "%s" % myip
+    response = session.get('http://ip.taobao.com/service/getIpInfo2.php?ip=myip')
+    res = response.text.strip()
+    resJson = json.loads(res)
+    return "%s" % resJson["data"]["ip"]
     
 def get_resolve_ip(host):
     try:
@@ -73,6 +84,7 @@ def modify_dns_record_ip(cns_service,domain,subdomain,record_id,ip):
     }
     print(params)
     return cns_service.call(action,params)
+
 def monitor_domain(domain, subdomain, secretId, secretKey,my_ip):
     #Need reqeust in https://console.cloud.tencent.com/capi
     host = "%s.%s" % (subdomain, domain)
@@ -124,6 +136,8 @@ def main():
             pass
         time.sleep(args.sleep)
 
+def main2():
+    print(get_out_ip_from_taobao());
 
 if (__name__ == '__main__'):
     main()
