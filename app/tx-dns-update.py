@@ -128,13 +128,17 @@ def main():
     parser.add_argument("--subdomain", type=str, required=True)
     parser.add_argument("--ip", type=str, default="0.0.0.0")
     parser.add_argument("--sleep", type=int, default=5)
+    parser.add_argument("--loop", type=int, default=1)
     args = parser.parse_args()
-    while True:
+    loop = True
+    while loop:
         try:
             monitor_domain(args.domain, args.subdomain, args.access_key_id, args.access_key_secret, args.ip)
         except Exception as e:
             pass
-        time.sleep(args.sleep)
+        loop = 1==args.loop
+        if loop:
+            time.sleep(args.sleep)
 
 def main2():
     print(get_out_ip_from_taobao());
